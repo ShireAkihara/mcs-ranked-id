@@ -1,22 +1,44 @@
 const crypto = require("crypto");
 
-const START_ELO = 10;
+const START_ELO = 800;
 
-const RANKS = [
-  { name: "Coal", min: 0 },
-  { name: "Iron", min: 600 },
-  { name: "Gold", min: 900 },
-  { name: "Emerald", min: 1200 },
-  { name: "Diamond", min: 1500 },
-  { name: "Netherite", min: 2000 },
+// Tingkatan rank: angka divisi 1 (terendah) sampai 3 (tertinggi). Netherite tanpa divisi.
+// Ubah angka "min" di sini kalau mau mengatur batas Elo.
+const DIVISIONS = [
+  { tier: "Coal", div: 1, min: 0 },
+  { tier: "Coal", div: 2, min: 400 },
+  { tier: "Coal", div: 3, min: 500 },
+  { tier: "Iron", div: 1, min: 600 },
+  { tier: "Iron", div: 2, min: 700 },
+  { tier: "Iron", div: 3, min: 800 },
+  { tier: "Gold", div: 1, min: 900 },
+  { tier: "Gold", div: 2, min: 1000 },
+  { tier: "Gold", div: 3, min: 1100 },
+  { tier: "Emerald", div: 1, min: 1200 },
+  { tier: "Emerald", div: 2, min: 1300 },
+  { tier: "Emerald", div: 3, min: 1400 },
+  { tier: "Diamond", div: 1, min: 1500 },
+  { tier: "Diamond", div: 2, min: 1650 },
+  { tier: "Diamond", div: 3, min: 1800 },
+  { tier: "Netherite", div: 0, min: 2000 },
 ];
+const RANKS = DIVISIONS;
 
-function getRank(elo) {
-  for (let i = RANKS.length - 1; i >= 0; i--) {
-    if (elo >= RANKS[i].min) return RANKS[i].name;
+function findDivision(elo) {
+  for (let i = DIVISIONS.length - 1; i >= 0; i--) {
+    if (elo >= DIVISIONS[i].min) return DIVISIONS[i];
   }
-  return RANKS[0].name;
+  return DIVISIONS[0];
 }
+
+// Contoh: "Gold 2", "Netherite"
+function getRank(elo) {
+  const d = findDivision(elo);
+  return d.div ? d.tier + " " + d.div : d.tier;
+}
+
+// Contoh: "Gold"
+const getTier = (elo) => findDivision(elo).tier;
 
 function kFactor(elo) {
   if (elo < 1200) return 40;
@@ -58,4 +80,4 @@ function pickSeed(elo1, elo2) {
   return { seed: String(bank[crypto.randomInt(bank.length)]), seedType: type };
 }
 
-module.exports = { START_ELO, RANKS, getRank, calcElo, pickSeed };
+module.exports = { START_ELO, RANKS, getRank, getTier, calcElo, pickSeed };

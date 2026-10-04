@@ -31,15 +31,28 @@ function fmt(ms) {
   const s = String(Math.floor(ms / 1000) % 60).padStart(2, "0");
   return m + ":" + s;
 }
+const tierOf = (rank) => String(rank).split(" ")[0];
 function badge(el, rank) {
   el.textContent = rank;
-  el.style.background = RANK_COLORS[rank] || "#8a8f98";
+  el.style.background = RANK_COLORS[tierOf(rank)] || "#8a8f98";
 }
+// Batas Elo awal tiap divisi (harus sama dengan backend/src/elo.js)
+const DIV_MINS = [0, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1650, 1800, 2000];
+
 function setUser(u) {
   S.user = u;
   $("meName").textContent = u.username;
   badge($("meRank"), u.rank);
-  $("homeElo").textContent = u.rank + " • " + u.elo + " Elo";
+  $("homeRank").textContent = u.rank;
+  $("homeElo").textContent = u.elo + " Elo";
+  const tier = tierOf(u.rank);
+  const em = $("rankEmblem");
+  em.textContent = tier[0];
+  em.style.background = RANK_COLORS[tier] || "#8a8f98";
+  const i = DIV_MINS.filter((m) => u.elo >= m).length - 1;
+  const next = DIV_MINS[i + 1];
+  $("rankFill").style.width = (next ? Math.round(((u.elo - DIV_MINS[i]) / (next - DIV_MINS[i])) * 100) : 100) + "%";
+  $("rankNext").textContent = next ? next - u.elo + " Elo lagi ke divisi berikutnya" : "Rank tertinggi";
 }
 function logLine(text) {
   const li = document.createElement("li");
@@ -121,7 +134,28 @@ function send(obj) {
   else toast("Belum terhubung ke server");
 }
 
+function toMod(obj) {
+  if (window.bridge) window.bridge.toMod(obj);
+}
+
+// Teruskan kejadian match ke mod Minecraft lewat jembatan lokal
+function relayToMod(m) {
+  switch (m.type) {
+    case "match_found":
+    case "match_resume":
+      toMod({ ...m, type: "match" });
+      break;
+    case "opponent_split":
+    case "opponent_disconnected":
+    case "opponent_reconnected":
+    case "match_end":
+      toMod(m);
+      break;
+  }
+}
+
 function onMsg(m) {
+  relayToMod(m);
   switch (m.type) {
     case "auth_ok": setUser(m.user); break;
     case "queue_joined": startQueueUi(); break;
@@ -214,7 +248,7 @@ async function loadLeaderboard() {
       cells.forEach((c, i) => {
         const td = document.createElement("td");
         td.textContent = c;
-        if (i === 2) td.style.color = RANK_COLORS[r.rank];
+        if (i === 2) td.style.color = RANK_COLORS[tierOf(r.rank)];
         tr.appendChild(td);
       });
       body.appendChild(tr);
@@ -244,6 +278,60 @@ document.querySelectorAll("[data-go]").forEach((b) => {
     show(S.match ? "match" : "home");
   };
 });
+
+// ---------- jembatan dari mod ----------
+if (window.bridge) {
+  window.bridge.onModStatus((on) => {
+    $("modConn").textContent = on ? "Mod: tersambung" : "Mod: belum tersambung";
+  });
+  window.bridge.onModMessage((m) => {
+    if (!S.match) return;
+    if (m.type === "split" && typeof m.name === "string" && Number.isFinite(m.igt)) {
+      send({ type: "split", name: m.name.slice(0, 32), igt: m.igt });
+      logLine("Kamu split: " + m.name);
+    } else if (m.type === "finish" && Number.isFinite(m.igt)) {
+      send({ type: "finish", igt: m.igt });
+    } else if (m.type === "forfeit") {
+      send({ type: "forfeit" });
+    }
+  });
+}
+
+// ---------- Minecraft ----------
+$("javaPath").value = localStorage.getItem("javaPath") || "";
+$("ramGb").value = localStorage.getItem("ramGb") || "4";
+
+if (window.bridge && window.bridge.play) {
+  S.gameBusy = false;
+  window.bridge.onGameProgress((p) => {
+    $("gameStatus").textContent = p.text;
+    $("gameBarWrap").hidden = false;
+    $("gameBar").style.width = p.pct + "%";
+  });
+  window.bridge.onGameState((running) => {
+    S.gameBusy = running;
+    $("btnPlay").disabled = running;
+    $("gameBarWrap").hidden = true;
+    $("gameStatus").textContent = running ? "Minecraft sedang berjalan" : "Minecraft ditutup";
+  });
+  $("btnPlay").onclick = async () => {
+    if (!S.user) return toast("Tunggu sampai terhubung ke server");
+    localStorage.setItem("javaPath", $("javaPath").value.trim());
+    localStorage.setItem("ramGb", $("ramGb").value);
+    $("btnPlay").disabled = true;
+    $("gameStatus").textContent = "Menyiapkan...";
+    const res = await window.bridge.play({
+      username: S.user.username,
+      javaPath: $("javaPath").value.trim(),
+      ramGb: Number($("ramGb").value) || 4,
+    });
+    if (!res.ok) {
+      $("gameStatus").textContent = res.error;
+      $("gameBarWrap").hidden = true;
+      $("btnPlay").disabled = false;
+    }
+  };
+}
 
 // ---------- start ----------
 $("server").value = S.api;

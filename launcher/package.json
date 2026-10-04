@@ -9,5 +9,8 @@
   },
   "devDependencies": {
     "electron": "^33.2.0"
+  },
+  "dependencies": {
+    "minecraft-launcher-core": "^3.18.2"
   }
 }

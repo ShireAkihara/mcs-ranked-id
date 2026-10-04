@@ -3,31 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; connect-src http: https: ws: wss:">
-  <title>MCSR Ranked</title>
+  <title>MCS Ranked</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header id="top" hidden>
-    <div class="brand">MCSR RANKED</div>
+<div class="layout">
+  <aside id="top" hidden>
+    <div class="brand">MCS<span>RANKED</span></div>
     <nav>
-      <button data-go="home">Main Menu</button>
+      <button data-go="home">Bermain</button>
       <button data-go="leaderboard">Leaderboard</button>
     </nav>
     <div class="me">
-      <span id="conn" class="dot"></span>
-      <span id="meName"></span>
+      <div class="meRow"><span id="conn" class="dot"></span><span id="meName"></span></div>
       <span id="meRank" class="badge"></span>
+      <span id="modConn" class="small">Mod: belum tersambung</span>
       <button id="logout" class="ghost">Keluar</button>
     </div>
-  </header>
+  </aside>
 
   <main>
     <section id="login" class="screen card narrow">
-      <h1>Masuk</h1>
+      <div class="brand big">MCS<span>RANKED</span></div>
+      <p class="muted">Ranked speedrun Minecraft 1v1</p>
       <input id="u" placeholder="Username (3-16 huruf/angka/_)" maxlength="16" autocomplete="username">
       <input id="p" type="password" placeholder="Password (min. 8 karakter)" autocomplete="current-password">
       <div class="row">
-        <button id="btnLogin">Masuk</button>
+        <button id="btnLogin" class="primary">Masuk</button>
         <button id="btnRegister" class="ghost">Daftar</button>
       </div>
       <label class="small">Server</label>
@@ -35,12 +37,29 @@
       <p id="loginMsg" class="err"></p>
     </section>
 
-    <section id="home" class="screen" hidden>
-      <div class="card center">
-        <h1>Ranked 1v1</h1>
-        <p id="homeElo" class="big"></p>
-        <button id="btnQueue" class="primary">MAIN RANKED</button>
-        <p id="queueInfo" class="muted"></p>
+    <section id="home" class="screen wide" hidden>
+      <div class="grid2">
+        <div class="card center">
+          <div id="rankEmblem" class="emblem">C</div>
+          <h1 id="homeRank" class="rankName"></h1>
+          <p id="homeElo" class="big"></p>
+          <div class="bar"><div id="rankFill"></div></div>
+          <p id="rankNext" class="small"></p>
+          <button id="btnQueue" class="primary">MAIN RANKED</button>
+          <p id="queueInfo" class="muted"></p>
+        </div>
+        <div class="card center">
+          <h2>Minecraft 1.16.1</h2>
+          <p id="gameStatus" class="muted">Belum dibuka</p>
+          <div id="gameBarWrap" class="bar" hidden><div id="gameBar"></div></div>
+          <button id="btnPlay" class="primary">Buka Minecraft</button>
+          <details>
+            <summary class="small">Pengaturan</summary>
+            <input id="javaPath" placeholder="Lokasi java.exe (kosongkan = cari Java 8 otomatis)">
+            <label class="small">RAM (GB)</label>
+            <input id="ramGb" type="number" min="2" max="16" value="4">
+          </details>
+        </div>
       </div>
     </section>
 
@@ -84,8 +103,8 @@
       </div>
     </section>
   </main>
-
-  <div id="toast" hidden></div>
-  <script src="renderer.js"></script>
+</div>
+<div id="toast" hidden></div>
+<script src="renderer.js"></script>
 </body>
 </html>
