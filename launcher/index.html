@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; connect-src http: https: ws: wss:">
+  <title>MCSR Ranked</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header id="top" hidden>
+    <div class="brand">MCSR RANKED</div>
+    <nav>
+      <button data-go="home">Main Menu</button>
+      <button data-go="leaderboard">Leaderboard</button>
+    </nav>
+    <div class="me">
+      <span id="conn" class="dot"></span>
+      <span id="meName"></span>
+      <span id="meRank" class="badge"></span>
+      <button id="logout" class="ghost">Keluar</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="login" class="screen card narrow">
+      <h1>Masuk</h1>
+      <input id="u" placeholder="Username (3-16 huruf/angka/_)" maxlength="16" autocomplete="username">
+      <input id="p" type="password" placeholder="Password (min. 8 karakter)" autocomplete="current-password">
+      <div class="row">
+        <button id="btnLogin">Masuk</button>
+        <button id="btnRegister" class="ghost">Daftar</button>
+      </div>
+      <label class="small">Server</label>
+      <input id="server" value="http://localhost:8080">
+      <p id="loginMsg" class="err"></p>
+    </section>
+
+    <section id="home" class="screen" hidden>
+      <div class="card center">
+        <h1>Ranked 1v1</h1>
+        <p id="homeElo" class="big"></p>
+        <button id="btnQueue" class="primary">MAIN RANKED</button>
+        <p id="queueInfo" class="muted"></p>
+      </div>
+    </section>
+
+    <section id="match" class="screen" hidden>
+      <div class="card center">
+        <p class="muted">Lawan</p>
+        <h1 id="oppName"></h1>
+        <p><span id="oppRank" class="badge"></span> <span id="oppElo"></span></p>
+        <p class="muted">Seed: <span id="seedInfo"></span></p>
+        <p id="clock" class="clock">--</p>
+        <div class="row">
+          <button id="btnForfeit" class="danger">Forfeit</button>
+        </div>
+        <div class="row test">
+          <span class="small">Mode uji (sementara, tanpa Minecraft):</span>
+          <button id="testSplit" class="ghost">Simulasi split</button>
+          <button id="testFinish" class="ghost">Simulasi finish</button>
+        </div>
+        <ul id="log"></ul>
+      </div>
+    </section>
+
+    <section id="result" class="screen" hidden>
+      <div class="card center">
+        <h1 id="resTitle"></h1>
+        <p id="resReason" class="muted"></p>
+        <p id="resElo" class="big"></p>
+        <p id="resRank"></p>
+        <button id="btnBack" class="primary">Kembali ke menu</button>
+      </div>
+    </section>
+
+    <section id="leaderboard" class="screen" hidden>
+      <div class="card">
+        <h1>Leaderboard</h1>
+        <table>
+          <thead><tr><th>#</th><th>Pemain</th><th>Rank</th><th>Elo</th><th>M</th><th>K</th></tr></thead>
+          <tbody id="lbBody"></tbody>
+        </table>
+        <p id="lbEmpty" class="muted" hidden>Belum ada pemain yang pernah bertanding.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" hidden></div>
+  <script src="renderer.js"></script>
+</body>
+</html>

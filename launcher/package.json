@@ -1,0 +1,13 @@
+{
+  "name": "mcsr-ranked-launcher",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "start:b": "electron . --profile=b"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0"
+  }
+}
