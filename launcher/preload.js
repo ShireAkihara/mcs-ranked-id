@@ -6,5 +6,9 @@ contextBridge.exposeInMainWorld("bridge", {
   play: (opts) => ipcRenderer.invoke("game-play", opts),
   onGameProgress: (cb) => ipcRenderer.on("game-progress", (_e, p) => cb(p)),
   onGameState: (cb) => ipcRenderer.on("game-state", (_e, running) => cb(running)),
+  skinGet: () => ipcRenderer.invoke("skin-get"),
+  skinImport: () => ipcRenderer.invoke("skin-import"),
+  skinModel: (model) => ipcRenderer.invoke("skin-model", model),
+  skinRemove: () => ipcRenderer.invoke("skin-remove"),
   onModStatus: (cb) => ipcRenderer.on("mod-status", (_e, connected) => cb(connected)),
 });

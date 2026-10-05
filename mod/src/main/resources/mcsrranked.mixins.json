@@ -4,7 +4,8 @@
   "package": "com.mcsrranked.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "ResourcePackManagerMixin"
+    "ResourcePackManagerMixin",
+    "AbstractClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

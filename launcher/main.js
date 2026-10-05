@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const net = require("net");
 const path = require("path");
 const game = require("./game");
+const skin = require("./skin");
 
 // Untuk tes 2 akun di 1 komputer: npm run start:b (data tersimpan terpisah)
 const profileArg = process.argv.find((a) => a.startsWith("--profile="));
@@ -108,6 +109,8 @@ ipcMain.handle("game-play", async (_e, opts) => {
     return { ok: false, error: e.message };
   }
 });
+
+skin.register(() => win);
 
 app.whenReady().then(() => {
   startBridge();

@@ -54,13 +54,35 @@ function calcElo(winnerElo, loserElo) {
 }
 
 // ---- Seed ----
-// Isi bank seed dengan seed hasil filter kamu sendiri (string angka).
-// Selama kosong, server memakai seed acak dan seedType "random".
-const SEED_BANK = {
-  random: [],
-  ruined_portal: [],
-  buried_treasure: [],
-};
+// Daftar seed dibaca dari backend/seeds.json (isi dengan seed yang sudah kamu uji sendiri).
+// Selama daftar kosong, server memakai seed acak.
+const fs = require("fs");
+const path = require("path");
+
+const MIN_SEED = -(2n ** 63n);
+const MAX_SEED = 2n ** 63n - 1n;
+
+function validSeed(value) {
+  const text = String(value).trim();
+  if (!/^-?\d{1,19}$/.test(text)) return false;
+  const n = BigInt(text);
+  return n >= MIN_SEED && n <= MAX_SEED;
+}
+
+function loadSeedBank() {
+  const bank = { random: [], ruined_portal: [], buried_treasure: [] };
+  try {
+    const data = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "seeds.json"), "utf8"));
+    for (const type of Object.keys(bank)) {
+      if (Array.isArray(data[type])) bank[type] = data[type].filter(validSeed).map((v) => String(v).trim());
+    }
+  } catch {
+    // tidak ada seeds.json: pakai seed acak
+  }
+  return bank;
+}
+
+const SEED_BANK = loadSeedBank();
 
 function seedTypesFor(elo) {
   const types = ["random"];
@@ -71,13 +93,14 @@ function seedTypesFor(elo) {
 
 const randomSeed = () => crypto.randomBytes(8).readBigInt64BE().toString();
 
-// Pakai Elo pemain yang lebih rendah supaya adil
+// Pakai Elo pemain yang lebih rendah supaya adil.
+// Hanya tipe yang daftarnya terisi yang dipilih; kalau semua kosong, seed acak.
 function pickSeed(elo1, elo2) {
-  const types = seedTypesFor(Math.min(elo1, elo2));
-  const type = types[crypto.randomInt(types.length)];
+  const available = seedTypesFor(Math.min(elo1, elo2)).filter((t) => SEED_BANK[t].length > 0);
+  if (available.length === 0) return { seed: randomSeed(), seedType: "random" };
+  const type = available[crypto.randomInt(available.length)];
   const bank = SEED_BANK[type];
-  if (bank.length === 0) return { seed: randomSeed(), seedType: "random" };
-  return { seed: String(bank[crypto.randomInt(bank.length)]), seedType: type };
+  return { seed: bank[crypto.randomInt(bank.length)], seedType: type };
 }
 
 module.exports = { START_ELO, RANKS, getRank, getTier, calcElo, pickSeed };

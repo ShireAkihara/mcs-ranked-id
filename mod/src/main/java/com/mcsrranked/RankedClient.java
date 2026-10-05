@@ -139,6 +139,14 @@ public class RankedClient implements ClientModInitializer {
 			}
 		}
 
+		// Waktu mulai tiba: buat world dari seed match (sekali per match)
+		if (RankedState.inMatch && RankedState.matchElapsedMs() >= 0L
+				&& RankedState.worldCreatedFor != RankedState.startsAt) {
+			RankedState.worldCreatedFor = RankedState.startsAt;
+			WorldCreator.createFromSeed(RankedState.seed);
+			return;
+		}
+
 		if (client.world == null) {
 			if (wasInWorld) {
 				resetPractice();
@@ -151,6 +159,7 @@ public class RankedClient implements ClientModInitializer {
 		// Baru masuk world: timer latihan mulai otomatis
 		if (!wasInWorld) {
 			wasInWorld = true;
+			SkinManager.reload(); // baca ulang skin kustom
 			if (!RankedState.inMatch) {
 				resetPractice();
 				igtTicks = 0L;

@@ -23,6 +23,7 @@ public final class RankedState {
 	public static volatile String seed = "";
 	public static volatile long startsAt = 0L;      // waktu mulai (jam server)
 	public static volatile long serverOffsetMs = 0L; // jam server - jam komputer
+	public static volatile long worldCreatedFor = 0L; // startsAt match yang worldnya sudah dibuat
 	public static volatile boolean finishSent = false;
 	public static volatile long finishMs = 0L;
 

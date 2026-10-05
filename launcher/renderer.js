@@ -275,9 +275,44 @@ $("btnForfeit").onclick = () => {
 document.querySelectorAll("[data-go]").forEach((b) => {
   b.onclick = () => {
     if (b.dataset.go === "leaderboard") return loadLeaderboard();
+    if (b.dataset.go === "skin") return openSkin();
     show(S.match ? "match" : "home");
   };
 });
+
+// ---------- skin ----------
+function renderSkin(s) {
+  $("skinModel").value = s.model;
+  $("skinImg").hidden = !s.exists;
+  if (s.exists) {
+    $("skinImg").src = s.dataUrl;
+    $("skinInfo").textContent = "Skin aktif: " + s.width + "x" + s.height;
+  } else {
+    $("skinInfo").textContent = "Belum ada skin kustom (memakai skin bawaan Minecraft)";
+  }
+}
+
+async function openSkin() {
+  show("skin");
+  if (window.bridge && window.bridge.skinGet) renderSkin(await window.bridge.skinGet());
+}
+
+if (window.bridge && window.bridge.skinGet) {
+  $("btnSkinImport").onclick = async () => {
+    const r = await window.bridge.skinImport();
+    if (r.ok) {
+      renderSkin(r);
+      toast("Skin diimpor. Berlaku saat kamu masuk ke world di Minecraft.");
+    } else if (!r.canceled) {
+      toast(r.error);
+    }
+  };
+  $("skinModel").onchange = () => window.bridge.skinModel($("skinModel").value);
+  $("btnSkinRemove").onclick = async () => {
+    await window.bridge.skinRemove();
+    renderSkin(await window.bridge.skinGet());
+  };
+}
 
 // ---------- jembatan dari mod ----------
 if (window.bridge) {

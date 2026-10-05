@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; connect-src http: https: ws: wss:">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src http: https: ws: wss:">
   <title>MCS Ranked</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -13,6 +13,7 @@
     <nav>
       <button data-go="home">Bermain</button>
       <button data-go="leaderboard">Leaderboard</button>
+      <button data-go="skin">Skin</button>
     </nav>
     <div class="me">
       <div class="meRow"><span id="conn" class="dot"></span><span id="meName"></span></div>
@@ -89,6 +90,24 @@
         <p id="resElo" class="big"></p>
         <p id="resRank"></p>
         <button id="btnBack" class="primary">Kembali ke menu</button>
+      </div>
+    </section>
+
+    <section id="skin" class="screen" hidden>
+      <div class="card center">
+        <h1>Skin</h1>
+        <img id="skinImg" alt="Skin aktif" hidden>
+        <p id="skinInfo" class="muted"></p>
+        <label class="small">Model lengan</label>
+        <select id="skinModel">
+          <option value="default">Classic (Steve)</option>
+          <option value="slim">Slim (Alex)</option>
+        </select>
+        <div class="row">
+          <button id="btnSkinImport" class="primary">Impor skin (PNG)</button>
+          <button id="btnSkinRemove" class="ghost">Hapus skin</button>
+        </div>
+        <p class="small">Mendukung PNG persegi 64x64, 128x128, 256x256, dan 512x512. Berlaku untuk pemain lokal di Minecraft yang dibuka dari launcher ini.</p>
       </div>
     </section>
 
